@@ -14,17 +14,22 @@ class Umskt < Formula
     system "cmake", "--build", "build"
     bin.install "build/umskt"
     lib.install "build/lib_umskt.dylib"
-    system "cp", "build/_deps/fmt-build/libfmt.10.0.0.dylib", "#{prefix}"
+    cp "build/_deps/fmt-build/libfmt.10.0.0.dylib", "#{prefix}/fmt.dylib"
   end
 
   def post_install
-    system "mv", "#{prefix}/libfmt.10.0.0.dylib", "#{lib}/libfmt.10.0.0.dylib"
-    system "ln", "-s", "#{lib}/libfmt.10.0.0.dylib", "#{lib}/libfmt.10.dylib"
-    system "ln", "-s", "#{lib}/libfmt.10.dylib", "#{lib}/libfmt.dylib"
-    system "install_name_tool", "-change", "@rpath/libfmt.10.dylib", "#{lib}/libfmt.10.dylib", "#{lib}/lib_umskt.dylib"
-    system "install_name_tool", "-change", "@rpath/lib_umskt.dylib", "#{lib}/lib_umskt.dylib", "#{bin}/umskt"
-    system "install_name_tool", "-change", "@rpath/libfmt.10.dylib", "#{lib}/libfmt.10.dylib", "#{bin}/umskt"
-    system "codesign", "--force", "--deep", "--preserve-metadata=entitlements,requirements,flags,runtime", "--sign", "-", "#{lib}/lib_umskt.dylib"
-    system "codesign", "--force", "--deep", "--preserve-metadata=entitlements,requirements,flags,runtime", "--sign", "-", "#{bin}/umskt"
+    mv "#{prefix}/fmt.dylib", "#{lib}/libfmt.10.0.0.dylib"
+    ln "#{lib}/libfmt.10.0.0.dylib", "#{lib}/libfmt.10.dylib"
+    ln "#{lib}/libfmt.10.dylib", "#{lib}/libfmt.dylib"
+    system "install_name_tool", "-change", "@rpath/libfmt.10.dylib",
+      "#{lib}/libfmt.10.dylib", "#{lib}/lib_umskt.dylib"
+    system "install_name_tool", "-change", "@rpath/lib_umskt.dylib",
+      "#{lib}/lib_umskt.dylib", "#{bin}/umskt"
+    system "install_name_tool", "-change", "@rpath/libfmt.10.dylib",
+      "#{lib}/libfmt.10.dylib", "#{bin}/umskt"
+    system "codesign", "--force", "--deep", "--preserve-metadata=entitlements,requirements,flags,runtime",
+      "--sign", "-", "#{lib}/lib_umskt.dylib"
+    system "codesign", "--force", "--deep", "--preserve-metadata=entitlements,requirements,flags,runtime",
+      "--sign", "-", "#{bin}/umskt"
   end
 end
